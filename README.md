@@ -13,8 +13,25 @@ its shadcn registry rather than reimplemented.
 
 ```bash
 npm install
+cp .env.example .env.local   # optional, see below
 npm run dev
 ```
+
+### GITHUB_TOKEN (optional)
+
+Without one, GitHub allows **60 requests/hour per IP**, which a handful of
+visitors exhausts — the panel then prints from seeded data and says
+`Simulated` in its footer. A token raises the limit to **5,000/hour**.
+
+It needs **no scopes at all**; it only reads public profiles. Create a
+fine-grained token with no permissions at
+<https://github.com/settings/tokens> and put it in `.env.local`, which is
+gitignored. Never paste a token into a chat, an issue, or a commit.
+
+The token is read only by `lib/github.ts`, which is marked `server-only` — so
+importing it from a client component is a build error rather than a leak.
+Browser-side scans go through `/api/gh/[login]`, which attaches the token
+server-side; the browser never sees it.
 
 ## Ratings
 

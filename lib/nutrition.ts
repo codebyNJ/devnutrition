@@ -65,9 +65,13 @@ type GhUser = {
   created_at?: string;
 };
 
+/* Client-side scans go through our own route, not straight to GitHub: the
+ * route attaches the server's token, so every visitor shares the 5,000/hour
+ * budget instead of burning their own IP's 60. Server components call
+ * lib/github.ts directly. */
 export async function fetchUser(login: string): Promise<GhUser | null> {
   try {
-    const res = await fetch(`https://api.github.com/users/${encodeURIComponent(login)}`);
+    const res = await fetch(`/api/gh/${encodeURIComponent(login)}`);
     return res.ok ? await res.json() : null;
   } catch {
     return null; // offline or rate-limited: the label still gets made
