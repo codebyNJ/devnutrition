@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // vendored from the Beautiful UI registry — owned upstream, not linted here
+    "components/primitives/**",
   ]),
 ]);
 

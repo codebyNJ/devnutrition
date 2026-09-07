@@ -6,12 +6,27 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --test --experimental-strip-types lib/*.test.ts",
+    "fix:foundation": "node scripts/fix-foundation.mjs",
+    "check:mobile": "node scripts/audit-mobile.mjs http://localhost:3000/ 360",
+    "check:export": "node scripts/check-export.mjs /tmp/devnutrition-export.png",
+    "check:sequence": "node scripts/check-sequence.mjs",
+    "check:theme": "node scripts/check-theme.mjs"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
+    "class-variance-authority": "^0.7.1",
+    "cn": "^0.2.6",
+    "glimm": "^0.3.0",
+    "html2canvas-pro": "^2.4.2",
+    "lucide-react": "^1.41.0",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "shadcn": "^4.21.0",
+    "shadow-plugin": "^2.1.0",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -20,7 +35,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
+    "playwright": "^1.63.0",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "A Swiss-style \"Nutrition Facts\" label for any GitHub developer, built on Beautiful UI primitives."
 }
