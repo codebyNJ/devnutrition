@@ -16,6 +16,15 @@ npm install
 npm run dev
 ```
 
+## Ratings
+
+Alongside the panel, `lib/card.ts` remaps the same numbers onto a scouting
+report: one overall rating out of 99, a position (`ICON`, `MAINT`, `OSS`, `VET`,
+`SUB`) derived from the reach-to-output ratio, and six three-letter stats —
+`CAF` `DBT` `DOC` `SOF` `DEP` `AUR`. Nothing new is measured; it is the same
+arithmetic in the shape a scouting report would use, printed in the panel's own
+typography rather than as a separate card.
+
 ## Grading
 
 The letter grade is built from three real signals — reach (followers), output
@@ -45,6 +54,7 @@ run has played out *and* cleared the screen.
 | Route | What it is |
 | --- | --- |
 | `/` | the scanner, with server-loaded examples and the repo's star count |
+| `/duel` | compare two developers panel against panel, with a per-stat breakdown |
 | `/scoring` | the methodology — which numbers are real, which are invented, how the grade is computed |
 
 ## Beautiful UI components used

@@ -251,6 +251,14 @@ export default function DevNutrition({
             F.D.A.
           </span>
           <div className="flex items-center gap-2">
+            <Link
+              href="/duel"
+              className="inline-flex h-9 items-center rounded-full bg-surface px-3 text-[12.5px]
+                font-medium text-ink shadow-btn transition-colors duration-150 hover:bg-hover
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Duel
+            </Link>
             <StarButton stars={stars} />
             <ThemeToggle />
           </div>
@@ -289,7 +297,13 @@ export default function DevNutrition({
       {phase === "idle" && (
         <>
           <ExampleGallery examples={examples} onPick={inspect} />
-          <p className="mt-8 text-center text-[12.5px] text-ink-2">
+          <p className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2 text-center text-[12.5px] text-ink-2">
+            <Link
+              href="/duel"
+              className="underline decoration-line-strong underline-offset-4 hover:text-ink"
+            >
+              Compare two developers
+            </Link>
             <Link
               href="/scoring"
               className="underline decoration-line-strong underline-offset-4 hover:text-ink"

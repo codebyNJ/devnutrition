@@ -6,6 +6,12 @@ export type Nutrition = {
   login: string;
   name: string;
   avatar: string | null;
+  /* profile colour, shown on the panel when GitHub gives it to us */
+  bio: string | null;
+  company: string | null;
+  location: string | null;
+  gists: number;
+  following: number;
   real: boolean;
   repos: number;
   followers: number;
@@ -49,8 +55,13 @@ type GhUser = {
   login?: string;
   name?: string | null;
   avatar_url?: string;
+  bio?: string | null;
+  company?: string | null;
+  location?: string | null;
   public_repos?: number;
+  public_gists?: number;
   followers?: number;
+  following?: number;
   created_at?: string;
 };
 
@@ -79,6 +90,11 @@ export function analyze(login: string, u: GhUser | null): Nutrition {
     login: u?.login ?? login,
     name: u?.name || (u?.login ?? login),
     avatar: u?.avatar_url ?? null,
+    bio: u?.bio?.trim() || null,
+    company: u?.company?.trim() || null,
+    location: u?.location?.trim() || null,
+    gists: u?.public_gists ?? 0,
+    following: u?.following ?? 0,
     real: !!u,
     repos,
     followers,

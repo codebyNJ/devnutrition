@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import type { Nutrition } from "@/lib/nutrition";
 import { gradeNote, n } from "@/lib/nutrition";
+import { cardPosition, cardRating, cardStats } from "@/lib/card";
 
 /* An FDA panel is a typographic system, not a card: hairline rules between
  * lines, heavy rules between blocks.
@@ -73,6 +74,44 @@ function GradeStamp({ grade, animate }: { grade: Nutrition["grade"]; animate: bo
         <span className="absolute bottom-[9px] font-mono text-[6.5px] tracking-[0.22em]">
           F.D.A.
         </span>
+      </div>
+    </div>
+  );
+}
+
+/* The rating block: one headline number and six three-letter stats, printed
+ * the way a supplement panel prints its active ingredients. Same arithmetic as
+ * the rest of the label, shown the way a scouting report would show it. */
+function ScoutingReport({ d, size }: { d: Nutrition; size: string }) {
+  const stats = cardStats(d);
+  return (
+    <div className="mt-3 border-t-[5px] border-black pt-2">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <div className="text-[11px] font-bold">Overall Rating</div>
+          <div className="font-mono text-[9px] tracking-[0.14em] text-black/50">
+            {cardPosition(d)} · {n(d.followers)} followers · {n(d.repos)} repos
+          </div>
+        </div>
+        <div className="font-mono text-[30px] leading-none font-bold tabular-nums">
+          {cardRating(d)}
+        </div>
+      </div>
+
+      <div className="mt-2 grid grid-cols-3 gap-x-3 gap-y-1">
+        {stats.map((st) => (
+          <div
+            key={st.key}
+            className="flex items-baseline gap-1.5 border-b border-black/15 py-0.5"
+            style={{ fontSize: size }}
+            title={st.label}
+          >
+            <span className="font-mono font-bold">{st.key}</span>
+            <span className="ml-auto font-mono tabular-nums">
+              {String(st.value).padStart(2, "0")}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -165,14 +204,24 @@ export default function NutritionLabel({
         )}
         {/* tracking is tighter on screen so the byline still clears the stamp
             on a narrow phone; the export has the room for the wider setting */}
-        <div
-          className={`min-w-0 font-mono uppercase text-black/55 ${
-            isExport ? "text-[10.5px] tracking-[0.16em]" : "text-[9.5px] tracking-[0.08em]"
-          }`}
-        >
-          @{d.login}
-          <span className="text-black/25"> · </span>
-          {d.years} yrs cultured
+        <div className="min-w-0">
+          <div
+            className={`truncate font-mono uppercase text-black/55 ${
+              isExport ? "text-[10.5px] tracking-[0.16em]" : "text-[9.5px] tracking-[0.08em]"
+            }`}
+          >
+            @{d.login}
+            <span className="text-black/25"> · </span>
+            {d.years} yrs cultured
+          </div>
+          {/* real profile detail when GitHub gives us any */}
+          {(d.name !== d.login || d.company || d.location) && (
+            <div className="truncate text-[10.5px] text-black/45">
+              {[d.name !== d.login ? d.name : null, d.company, d.location]
+                .filter(Boolean)
+                .join(" · ")}
+            </div>
+          )}
         </div>
       </div>
 
@@ -227,7 +276,9 @@ export default function NutritionLabel({
         <Line size={t.body} label="Raw Aura / Clout" dv={`${d.aura}%`} />
       </div>
 
-      <p className="pt-2 text-[10.5px] leading-snug text-black/55">
+      <ScoutingReport d={d} size={t.body} />
+
+      <p className="pt-3 text-[10.5px] leading-snug text-black/55">
         * Percent Daily Values are based on a 2,000 commit diet. Documentation is naturally low and
         occurs in trace amounts only.
       </p>
@@ -235,6 +286,11 @@ export default function NutritionLabel({
         <span className="font-bold">Ingredients:</span> Purified espresso, late-night commit regret,
         unformatted JSON, broken unit tests, traces of rust and hallucinated APIs.
       </p>
+      {d.bio && (
+        <p className="mt-2 text-[11px] leading-relaxed text-black/60">
+          <span className="font-bold text-black">Declared by manufacturer:</span> &ldquo;{d.bio}&rdquo;
+        </p>
+      )}
       <div className="mt-4 border-2 border-black p-3 text-[11.5px] leading-relaxed">
         <span className="font-black tracking-wide uppercase">Warning:</span> Excessive consumption of
         this developer&rsquo;s code may cause merge conflicts, existential dread, and unexpected
