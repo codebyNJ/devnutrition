@@ -22,6 +22,9 @@
 
 # misc
 .DS_Store
+
+# screenshots left by the browser checks
+/*.png
 *.pem
 
 # debug

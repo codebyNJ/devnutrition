@@ -38,7 +38,7 @@ const GRADE_NOTE: Record<Grade, string> = {
 
 export const gradeNote = (g: Grade) => GRADE_NOTE[g];
 
-const fnv = (s: string) => {
+export const fnv = (s: string) => {
   let h = 2166136261;
   for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
   return h;
@@ -104,6 +104,8 @@ export function analyze(login: string, u: GhUser | null): Nutrition {
   base.grade = gradeFor(base);
   return base;
 }
+
+export const REPO_URL = "https://github.com/codebyNJ/devnutrition";
 
 export const n = (x: number) => x.toLocaleString("en-US");
 

@@ -1,8 +1,10 @@
 /* The toggle must flip the <html> class, repaint the page, survive a reload,
  * and leave the label as black-on-white paper in both themes. */
 import { chromium } from "playwright";
+import os from "node:os";
 
-const SP = process.argv[2] ?? ".";
+/* default to a temp dir — a check should not leave files in the repo */
+const SP = process.argv[2] ?? os.tmpdir();
 const browser = await chromium.launch({ channel: "chrome" });
 const page = await browser.newPage({ viewport: { width: 390, height: 900 }, deviceScaleFactor: 2 });
 const errs = [];

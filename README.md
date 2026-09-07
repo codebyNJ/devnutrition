@@ -30,6 +30,13 @@ once mounted, and those timelines are longer than any single component's complet
 callback — so the sequence is timed centrally, and the label is only revealed once the
 run has played out *and* cleared the screen.
 
+## Pages
+
+| Route | What it is |
+| --- | --- |
+| `/` | the scanner, with server-loaded examples and the repo's star count |
+| `/scoring` | the methodology — which numbers are real, which are invented, how the grade is computed |
+
 ## Beautiful UI components used
 
 Installed via `npx shadcn@latest add https://www.beautifului.dev/r/{name}.json`:
