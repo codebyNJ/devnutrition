@@ -14,7 +14,7 @@ await page.goto(url, { waitUntil: "networkidle" });
  * streamed verdict are where overflow would actually bite */
 const handle = process.argv[4] ?? "torvalds";
 if (handle !== "none") {
-  await page.getByRole("button", { name: `Inspect ${handle}` }).click();
+  await page.getByRole("button", { name: `Inspect ${handle}`, exact: true }).click();
   await page.waitForSelector("text=Nutrition Facts", { timeout: 20000 });
 }
 await page.waitForTimeout(2500);

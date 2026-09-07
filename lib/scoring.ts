@@ -89,14 +89,51 @@ export const METRICS: Metric[] = [
 ];
 
 export const GRADE_BANDS = [
-  { grade: "A", min: 68, note: "Exemplary. Suspiciously so." },
-  { grade: "B", min: 56, note: "Edible. Ships on Fridays." },
-  { grade: "C", min: 44, note: "Consume with supervision." },
-  { grade: "D", min: 32, note: "Do not deploy on a Friday." },
+  { grade: "A+", min: 66, note: "Certified organic. Feeds thousands." },
+  { grade: "A", min: 55, note: "Grade A. Widely consumed." },
+  { grade: "B", min: 44, note: "Wholesome. Ships on Fridays." },
+  { grade: "C", min: 33, note: "Consume with supervision." },
+  { grade: "D", min: 22, note: "Do not deploy on a Friday." },
   { grade: "F", min: -Infinity, note: "Condemned by inspectors." },
 ] as const;
 
-export const GRADE_FORMULA = "40 + aura×0.45 + documentation×9 − techDebt/55 − stackOverflow×0.28";
+/* Three real terms and one small invented one. The invented metrics used to
+ * dominate this, which graded career open-source maintainers an F. */
+export const GRADE_TERMS = [
+  {
+    name: "Reach",
+    max: "45 pts",
+    formula: "min(45, log₁₀(followers + 1) × 8.2)",
+    blurb:
+      "Capped highest because it is the one signal that cannot be inflated by pushing more repositories. Log-scaled, so the very top of GitHub does not run away with the scale.",
+    grounded: true,
+  },
+  {
+    name: "Output",
+    max: "20 pts",
+    formula: "min(20, log₁₀(public_repos + 1) × 7)",
+    blurb:
+      "Rewards shipping publicly, but capped — a thousand repositories is worth more than ten, and not a hundred times more.",
+    grounded: true,
+  },
+  {
+    name: "Tenure",
+    max: "12 pts",
+    formula: "min(12, accountAgeYears × 0.85)",
+    blurb: "Time served. Maxes out at about fourteen years on the platform.",
+    grounded: true,
+  },
+  {
+    name: "Craft",
+    max: "≈ ±10 pts",
+    formula: "documentation×2 − techDebt/500 − stackOverflow×0.06",
+    blurb:
+      "The invented metrics, deliberately kept small. They can nudge a grade across a boundary; they can no longer decide one.",
+    grounded: false,
+  },
+] as const;
+
+export const GRADE_FORMULA = "reach + output + tenure + craft";
 
 /* Per-handle stage durations, so the scan takes a different shape for each
  * developer instead of replaying one canned timeline. Deterministic: the same

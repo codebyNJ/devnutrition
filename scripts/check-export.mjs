@@ -12,14 +12,14 @@ const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 
 await page.goto("http://localhost:3000/", { waitUntil: "networkidle" });
-await page.getByRole("button", { name: "Inspect torvalds" }).click();
+await page.getByRole("button", { name: "Inspect torvalds", exact: true }).click();
 await page.waitForSelector("text=Nutrition Facts", { timeout: 20000 });
 
-const btn = page.getByRole("button", { name: "Download Label" });
+const btn = page.getByRole("button", { name: "Download", exact: true });
 await btn.waitFor();
 /* the button stays disabled until the PNG is ready — that gate is the thing
  * that keeps navigator.share() inside the user gesture on iOS */
-await page.waitForSelector('button:text-is("Download Label"):not([disabled])', { timeout: 20000 });
+await page.waitForSelector('button:text-is("Download"):not([disabled])', { timeout: 20000 });
 
 const [download] = await Promise.all([page.waitForEvent("download", { timeout: 20000 }), btn.click()]);
 const stream = await download.createReadStream();

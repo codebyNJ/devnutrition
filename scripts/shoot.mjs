@@ -18,7 +18,7 @@ page.on("console", (m) => m.type() === "error" && errors.push(`console: ${m.text
 await page.goto(url, { waitUntil: "networkidle" });
 
 if (handle) {
-  await page.getByRole("button", { name: `Inspect ${handle}` }).click();
+  await page.getByRole("button", { name: `Inspect ${handle}`, exact: true }).click();
   await page.waitForSelector("text=Nutrition Facts", { timeout: 20000 });
   await page.waitForTimeout(3500); // let the streamed verdict finish
 }

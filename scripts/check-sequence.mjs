@@ -10,7 +10,7 @@ page.on("pageerror", (e) => errs.push(e.message));
 await page.goto("http://localhost:3000/", { waitUntil: "networkidle" });
 
 const t0 = Date.now();
-await page.getByRole("button", { name: "Inspect torvalds" }).click();
+await page.getByRole("button", { name: "Inspect torvalds", exact: true }).click();
 
 const frames = [];
 for (let i = 0; i < 60; i++) {

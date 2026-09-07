@@ -16,6 +16,16 @@ npm install
 npm run dev
 ```
 
+## Grading
+
+The letter grade is built from three real signals — reach (followers), output
+(public repos) and tenure (account age) — plus a small nudge from the invented
+metrics. An earlier version inverted that weighting and handed an **F** to people
+whose entire public record is years of open source; `lib/nutrition.test.ts` now
+asserts that prolific maintainers grade A or A+, that five thousand empty
+repositories do not buy a good grade, and that a brand-new account is not graded
+like a veteran.
+
 ## How it works
 
 Public profile data comes from `api.github.com/users/{handle}`. Everything else is
@@ -75,6 +85,9 @@ npm run check:export   # Download produces a 1080px-wide PNG
 
 ## Notes
 
+- The examples on the landing page are the real generated label, rendered by the
+  same component in the same `export` mode that produces the shared PNG, scaled
+  down — not a summary of it.
 - The label stays black on white in both themes. It is a paper artifact, and keeping it
   out of the theme is also what makes the exported PNG identical everywhere.
 - Sharing uses `navigator.share({ files })` so the real PNG reaches the X app on a

@@ -26,11 +26,12 @@ export type Nutrition = {
 
 /* A health-inspection letter, weighted so most working developers land
  * somewhere unflattering. That is the joke. */
-export type Grade = "A" | "B" | "C" | "D" | "F";
+export type Grade = "A+" | "A" | "B" | "C" | "D" | "F";
 
 const GRADE_NOTE: Record<Grade, string> = {
-  A: "Exemplary. Suspiciously so.",
-  B: "Edible. Ships on Fridays.",
+  "A+": "Certified organic. Feeds thousands.",
+  A: "Grade A. Widely consumed.",
+  B: "Wholesome. Ships on Fridays.",
   C: "Consume with supervision.",
   D: "Do not deploy on a Friday.",
   F: "Condemned by inspectors.",
@@ -109,14 +110,44 @@ export const REPO_URL = "https://github.com/codebyNJ/devnutrition";
 
 export const n = (x: number) => x.toLocaleString("en-US");
 
-function gradeFor(d: {
-  aura: number; docs: number; debt: number; stackOverflow: number;
-}): Grade {
-  const score =
-    40 + d.aura * 0.45 + d.docs * 9 - d.debt / 55 - d.stackOverflow * 0.28;
-  if (score >= 68) return "A";
-  if (score >= 56) return "B";
-  if (score >= 44) return "C";
-  if (score >= 32) return "D";
-  return "F";
+/* The grade is earned from what a public profile actually shows: reach,
+ * output, and how long they have been at it. The invented metrics only nudge
+ * it.
+ *
+ * An earlier version let those invented metrics dominate, which handed an F to
+ * people whose entire visible record is years of open source. That was the
+ * model being wrong, not the joke landing — a satire of nutrition labels can
+ * be absurd about tech debt while still being fair about who ships.
+ *
+ * Reach is capped highest: it is the one signal that cannot be inflated by
+ * pushing more repositories. It is log-scaled so the very top of GitHub does
+ * not run away with the scale. */
+export type GradeInputs = {
+  followers: number;
+  repos: number;
+  years: string;
+  docs: number;
+  debt: number;
+  stackOverflow: number;
+};
+
+export function gradeScore(d: GradeInputs): number {
+  const reach = Math.min(45, Math.log10(d.followers + 1) * 8.2);
+  const output = Math.min(20, Math.log10(d.repos + 1) * 7);
+  const tenure = Math.min(12, Number(d.years) * 0.85);
+  const craft = d.docs * 2 - d.debt / 500 - d.stackOverflow * 0.06;
+  return reach + output + tenure + craft;
+}
+
+const BANDS: [number, Grade][] = [
+  [66, "A+"],
+  [55, "A"],
+  [44, "B"],
+  [33, "C"],
+  [22, "D"],
+];
+
+function gradeFor(d: GradeInputs): Grade {
+  const score = gradeScore(d);
+  return BANDS.find(([min]) => score >= min)?.[1] ?? "F";
 }

@@ -24,7 +24,7 @@ await toggle.click();
 await page.waitForTimeout(450);
 const after = await read();
 
-await page.getByRole("button", { name: "Inspect torvalds" }).click();
+await page.getByRole("button", { name: "Inspect torvalds", exact: true }).click();
 await page.waitForSelector("text=Nutrition Facts", { timeout: 25000 });
 await page.waitForTimeout(3800);
 const labelBg = await page.evaluate(() => {

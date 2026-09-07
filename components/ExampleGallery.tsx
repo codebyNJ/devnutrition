@@ -1,19 +1,22 @@
 "use client";
 
+import NutritionLabel from "@/components/NutritionLabel";
 import type { Nutrition } from "@/lib/nutrition";
-import { gradeNote, n } from "@/lib/nutrition";
+import { gradeNote } from "@/lib/nutrition";
 
-/* Already-inspected developers, scanned on the server so the page opens with
- * real grades rather than an empty state. Picking one replays the audit using
- * the data already in hand — no second round-trip. */
-
-const GRADE_TONE: Record<Nutrition["grade"], string> = {
-  A: "text-green",
-  B: "text-green",
-  C: "text-orange",
-  D: "text-orange",
-  F: "text-red",
-};
+/* Each card is the real thing: the same component, in the same `export` mode
+ * that produces the shared PNG, scaled down. Not a summary of the label — the
+ * label itself, which is what people are actually here to see.
+ *
+ * PREVIEW_W is the export width; the card scales it to fit and clips to the
+ * top of the panel, where the stamp, title and calories live. */
+/* transform: scale() takes a unitless factor, so this is a fixed ratio rather
+ * than a fit-to-container calc. 540 x 0.55 = 297px, which fits the one-column
+ * phone layout and the two-column desktop grid without measuring anything. */
+const EXPORT_W = 540;
+const SCALE = 0.55;
+const PREVIEW_W = EXPORT_W * SCALE;
+const CARD_H = 236;
 
 export default function ExampleGallery({
   examples,
@@ -30,36 +33,40 @@ export default function ExampleGallery({
         Previously inspected
       </h2>
 
-      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {examples.map((d) => (
           <button
             key={d.login}
             type="button"
             onClick={() => onPick(d.login)}
-            className="group flex items-center gap-3 rounded-card bg-surface p-3 text-left
-              shadow-btn transition-colors duration-150 hover:bg-hover
+            aria-label={`Inspect ${d.login}, graded ${d.grade}`}
+            className="group overflow-hidden rounded-card bg-surface text-left shadow-btn
+              transition-transform duration-200 hover:-translate-y-0.5
               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <span
-              className={`grid size-10 shrink-0 place-items-center rounded-full border-2
-                border-current text-[17px] font-black ${GRADE_TONE[d.grade]}`}
-              aria-hidden
+            <div
+              className="relative mx-auto overflow-hidden bg-white"
+              style={{ height: CARD_H, width: PREVIEW_W }}
             >
-              {d.grade}
-            </span>
+              <div
+                className="origin-top-left"
+                style={{ width: EXPORT_W, transform: `scale(${SCALE})` }}
+                aria-hidden
+              >
+                <NutritionLabel d={d} mode="export" />
+              </div>
+              {/* fade the clip line so it reads as a preview, not a crop bug */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-white" />
+            </div>
 
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13.5px] font-medium text-ink">
+            <div className="flex items-center gap-2 border-t border-line px-3 py-2.5">
+              <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">
                 @{d.login}
               </span>
-              <span className="block truncate font-mono text-[11px] text-ink-3">
-                {n(d.caffeine)}mg · {d.docs}% docs · {d.aura}% aura
+              <span className="shrink-0 font-mono text-[11px] text-ink-3">
+                {gradeNote(d.grade)}
               </span>
-            </span>
-
-            <span className="hidden max-w-[38%] shrink-0 text-right font-mono text-[10px] leading-tight text-ink-3 sm:block">
-              {gradeNote(d.grade)}
-            </span>
+            </div>
           </button>
         ))}
       </div>
@@ -69,8 +76,8 @@ export default function ExampleGallery({
         * the one dishonest thing on the page. */}
       <p className="mt-3 text-center font-mono text-[10.5px] text-ink-3">
         {examples.every((e) => e.real)
-          ? "Grades from live GitHub data · re-inspect any of them"
-          : "Simulated — GitHub rate limit reached · re-inspect any of them"}
+          ? "Grades from live GitHub data · tap to re-inspect"
+          : "Simulated — GitHub rate limit reached · tap to re-inspect"}
       </p>
     </section>
   );

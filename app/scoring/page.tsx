@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { GRADE_BANDS, GRADE_FORMULA, METRICS } from "@/lib/scoring";
+import { GRADE_BANDS, GRADE_FORMULA, GRADE_TERMS, METRICS } from "@/lib/scoring";
 import { REPO_URL } from "@/lib/nutrition";
 
 export const metadata: Metadata = {
@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 const TONE: Record<string, string> = {
+  "A+": "text-green",
   A: "text-green",
   B: "text-green",
   C: "text-orange",
@@ -39,10 +40,11 @@ export default function ScoringPage() {
         </h1>
         <p className="mt-3 text-[14px] leading-relaxed text-ink-2">
           Short version: {grounded.length} of the {METRICS.length} values on the panel are
-          derived from a real GitHub profile. The rest are invented — deterministically, so
-          they never change for a given handle, but invented all the same. This page says
-          which is which, because a joke that quietly pretends to be a measurement is just
-          a lie with better typography.
+          derived from a real GitHub profile, and the letter grade is built almost entirely
+          from real ones. The rest are invented — deterministically, so they never change
+          for a given handle, but invented all the same. This page says which is which,
+          because a joke that quietly pretends to be a measurement is just a lie with
+          better typography.
         </p>
       </header>
 
@@ -113,6 +115,35 @@ export default function ScoringPage() {
           <pre className="overflow-x-auto rounded-chip bg-field px-3 py-2 font-mono text-[11.5px] text-ink">
             score = {GRADE_FORMULA}
           </pre>
+
+          <p className="mt-3 text-[13px] leading-relaxed text-ink-2">
+            Three of those four terms come from the profile. An earlier version of this
+            page described a formula built mostly out of the invented metrics — it graded
+            career open-source maintainers an <strong className="text-ink">F</strong>,
+            which was the model being wrong rather than the joke landing.
+          </p>
+
+          <div className="mt-4 space-y-2">
+            {GRADE_TERMS.map((t) => (
+              <div key={t.name} className="rounded-chip bg-field p-3">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="text-[13px] font-bold text-ink">{t.name}</span>
+                  <span className="font-mono text-[11px] text-ink-3">up to {t.max}</span>
+                  <span
+                    className={`ml-auto rounded-full px-2 py-0.5 font-mono text-[9.5px] tracking-wide uppercase ${
+                      t.grounded ? "bg-green-tint text-green" : "bg-orange-tint text-orange"
+                    }`}
+                  >
+                    {t.grounded ? "from profile" : "invented"}
+                  </span>
+                </div>
+                <pre className="mt-2 overflow-x-auto font-mono text-[11px] text-ink-2">
+                  {t.formula}
+                </pre>
+                <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-2">{t.blurb}</p>
+              </div>
+            ))}
+          </div>
           <ul className="mt-4 space-y-2">
             {GRADE_BANDS.map((b) => (
               <li key={b.grade} className="flex items-center gap-3">
@@ -130,10 +161,10 @@ export default function ScoringPage() {
             ))}
           </ul>
           <p className="mt-4 text-[13px] leading-relaxed text-ink-2">
-            Documentation is weighted at ×9 against a ceiling of 4%, so it can only ever
-            contribute 36 points — enough to matter, never enough to save a panel on its
-            own. Tech debt divides rather than subtracts flat, which is why a spectacular
-            debt figure drags a grade down without single-handedly deciding it.
+            Reach carries the most weight because it is the hardest term to inflate:
+            publishing five thousand empty repositories moves Output by its cap of 20 and
+            leaves Reach untouched. Craft can push a panel across a boundary; it can no
+            longer decide one on its own.
           </p>
         </div>
       </section>

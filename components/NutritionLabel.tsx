@@ -53,18 +53,26 @@ function useCountUp(target: number, run: boolean, ms = 900) {
 }
 
 function GradeStamp({ grade, animate }: { grade: Nutrition["grade"]; animate: boolean }) {
+  /* Two concentric hairlines and one letter. The previous version stacked
+   * three lines of type inside 74px, which just read as grey mush at label
+   * scale and worse in the exported PNG. */
+  const wide = grade.length > 1; // "A+" needs a little more room than "B"
   return (
     <div
-      className={`pointer-events-none absolute -top-1 right-4 grid size-[74px] select-none
-        place-items-center rounded-full border-[3px] border-black text-black
+      className={`pointer-events-none absolute top-3 right-4 select-none
         ${animate ? "animate-stamp-in" : "-rotate-[11deg]"}`}
-      style={animate ? undefined : { transform: "rotate(-11deg)" }}
       aria-hidden
     >
-      <div className="text-center leading-none">
-        <div className="font-mono text-[8px] tracking-[0.14em]">DEV GRADE</div>
-        <div className="text-[30px] leading-[1.05] font-black">{grade}</div>
-        <div className="font-mono text-[7px] tracking-[0.1em]">F.D.A.</div>
+      <div className="relative grid size-[68px] place-items-center rounded-full border-[2.5px] border-black text-black">
+        <span className="absolute inset-[5px] rounded-full border border-black/35" />
+        <span
+          className={`leading-none font-black tracking-[-0.04em] ${wide ? "text-[26px]" : "text-[30px]"}`}
+        >
+          {grade}
+        </span>
+        <span className="absolute bottom-[9px] font-mono text-[6.5px] tracking-[0.22em]">
+          F.D.A.
+        </span>
       </div>
     </div>
   );
@@ -145,7 +153,7 @@ export default function NutritionLabel({
       )}
       <GradeStamp grade={d.grade} animate={!isExport} />
       {/* pr- clears the grade stamp parked in the top-right corner */}
-      <div className="flex items-center gap-3 pr-[80px] pb-3">
+      <div className="flex items-center gap-3 pr-[76px] pb-3">
         {d.avatar && (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
@@ -155,7 +163,13 @@ export default function NutritionLabel({
             className="size-9 shrink-0 rounded-full border border-black/15"
           />
         )}
-        <div className="min-w-0 font-mono text-[10.5px] tracking-[0.16em] uppercase text-black/55">
+        {/* tracking is tighter on screen so the byline still clears the stamp
+            on a narrow phone; the export has the room for the wider setting */}
+        <div
+          className={`min-w-0 font-mono uppercase text-black/55 ${
+            isExport ? "text-[10.5px] tracking-[0.16em]" : "text-[9.5px] tracking-[0.08em]"
+          }`}
+        >
           @{d.login}
           <span className="text-black/25"> · </span>
           {d.years} yrs cultured

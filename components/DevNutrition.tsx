@@ -16,11 +16,20 @@ import { Button } from "@/components/atoms/Button";
 import { EntityChip } from "@/components/atoms/EntityChip";
 import { ValuePill } from "@/components/atoms/ValuePill";
 import NutritionLabel from "@/components/NutritionLabel";
-import { analyze, fetchUser, n, type Nutrition } from "@/lib/nutrition";
+import { analyze, fetchUser, gradeNote, n, type Nutrition } from "@/lib/nutrition";
 import { totalRunMs } from "@/lib/scoring";
 import { renderPng, shareLabel, saveFile } from "@/lib/share";
 
 type Phase = "idle" | "scanning" | "closing" | "done";
+
+const GRADE_TONE: Record<Nutrition["grade"], string> = {
+  "A+": "text-green",
+  A: "text-green",
+  B: "text-green",
+  C: "text-orange",
+  D: "text-orange",
+  F: "text-red",
+};
 
 /* Beats of the audit, ms from the moment Inspect is pressed. Each primitive
  * starts its own animation when it mounts, so mounting them on these beats is
@@ -323,21 +332,47 @@ export default function DevNutrition({
       )}
 
       {result && (
-        <section className="mt-10 flex flex-col items-center gap-6">
+        <section className="mt-10">
+          {/* verdict line: who, what grade, and the inspector's note — the
+              summary someone reads before deciding to look at the panel */}
+          <div className="animate-label-in mb-5 flex flex-col items-center gap-2 text-center">
+            <span className="font-mono text-[10.5px] tracking-[0.2em] uppercase text-ink-3">
+              Inspection complete
+            </span>
+            <div className="flex items-center gap-3">
+              <span
+                className={`grid size-11 shrink-0 place-items-center rounded-full border-2
+                  border-current text-[17px] font-black ${GRADE_TONE[result.grade]}`}
+                aria-hidden
+              >
+                {result.grade}
+              </span>
+              <span className="text-left">
+                <span className="block text-[15px] font-bold text-ink">@{result.login}</span>
+                <span className="block text-[12.5px] text-ink-2">{gradeNote(result.grade)}</span>
+              </span>
+            </div>
+          </div>
+
           <div className="animate-label-in flex w-full justify-center">
             <NutritionLabel d={result} />
           </div>
 
-          {/* the flagged additives, called out in the library's own pills —
-              the panel itself stays plain black on white */}
-          <div className="flex max-w-md flex-wrap justify-center gap-1.5">
-            <ValuePill tone="red">Tech debt {n(result.debt)}%</ValuePill>
-            <ValuePill tone="orange">Caffeine {n(result.caffeine)}mg</ValuePill>
-            <ValuePill tone="green">Docs {result.docs}%</ValuePill>
-            <ValuePill tone="accent">Aura {result.aura}%</ValuePill>
+          {/* the flagged additives, in the library's own pills — the panel
+              itself stays plain black on white */}
+          <div className="mx-auto mt-6 max-w-md">
+            <h3 className="mb-2 text-center font-mono text-[10px] tracking-[0.2em] uppercase text-ink-3">
+              Flagged additives
+            </h3>
+            <div className="flex flex-wrap justify-center gap-1.5">
+              <ValuePill tone="red">Tech debt {n(result.debt)}%</ValuePill>
+              <ValuePill tone="orange">Caffeine {n(result.caffeine)}mg</ValuePill>
+              <ValuePill tone="green">Docs {result.docs}%</ValuePill>
+              <ValuePill tone="accent">Aura {result.aura}%</ValuePill>
+            </div>
           </div>
 
-          <div className="w-full max-w-md">
+          <div className="mx-auto mt-6 max-w-md rounded-card bg-surface p-4 shadow-btn">
             <StreamingText
               content={VERDICT}
               loop={false}
@@ -358,26 +393,36 @@ export default function DevNutrition({
             />
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2">
-            <Button variant="primary" onClick={onShare} disabled={!png}>
-              {png ? "Share on X" : "Preparing image…"}
-            </Button>
-            <Button variant="secondary" onClick={() => png && result && saveFile(png, result.login)} disabled={!png}>
-              Download Label
-            </Button>
-            <Button variant="ghost" onClick={reset}>
-              Inspect Another
-            </Button>
+          <div className="mt-7 flex flex-col items-center gap-3">
+            <div className="flex w-full max-w-md flex-wrap justify-center gap-2">
+              {/* auto width, wrapping as a group — flex-1 squeezed the third
+                  pill until its label broke across two lines on a phone */}
+              <Button variant="primary" onClick={onShare} disabled={!png} className="whitespace-nowrap">
+                {png ? "Share on X" : "Preparing image…"}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => png && result && saveFile(png, result.login)}
+                disabled={!png}
+                className="whitespace-nowrap"
+              >
+                Download
+              </Button>
+              <Button variant="ghost" onClick={reset} className="whitespace-nowrap">
+                Scan another
+              </Button>
+            </div>
+
+            {note && <p className="max-w-md text-center text-[12.5px] text-ink-2">{note}</p>}
+
+            <Link
+              href="/scoring"
+              className="font-mono text-[11px] tracking-[0.14em] uppercase text-ink-3
+                underline decoration-line-strong underline-offset-4 hover:text-ink"
+            >
+              How is this scored?
+            </Link>
           </div>
-
-          {note && <p className="max-w-md text-center text-[12.5px] text-ink-2">{note}</p>}
-
-          <Link
-            href="/scoring"
-            className="text-[12.5px] text-ink-2 underline decoration-line-strong underline-offset-4 hover:text-ink"
-          >
-            How is this scored?
-          </Link>
         </section>
       )}
 
