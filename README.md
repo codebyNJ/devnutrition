@@ -59,7 +59,9 @@ Installed via `npx shadcn@latest add https://www.beautifului.dev/r/{name}.json`:
 | `task-rows` | the completed-checks list |
 | `loading-state` | elapsed-time scan indicator |
 | `streaming-text` | the streamed verdict, its source and follow-ups |
-| `button` · `entity-chip` · `value-pill` | actions, preset handles, flagged additives |
+| `context-cards` | the three profile fields the grade is actually built from |
+| `recommendation-card` | the consumption advisory, with its confidence meter |
+| `button` · `entity-chip` · `value-pill` · `shimmer` | actions, preset handles, flagged additives |
 
 `prompt-bar` was installed, tried, and removed: it is a full chat composer (textarea,
 model picker, dictation, `@`-menus) and this app takes a single word. It is not in the

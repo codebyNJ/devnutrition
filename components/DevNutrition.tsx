@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import HandleInput from "@/components/HandleInput";
 import ThemeToggle from "@/components/ThemeToggle";
 import ScoreMeter from "@/components/ScoreMeter";
+import ProfileContext from "@/components/ProfileContext";
+import Advisory from "@/components/Advisory";
 import ExampleGallery from "@/components/ExampleGallery";
 import StarButton from "@/components/StarButton";
 import Link from "next/link";
@@ -22,6 +24,14 @@ import { renderPng, shareLabel, saveFile } from "@/lib/share";
 
 type Phase = "idle" | "scanning" | "closing" | "done";
 
+/* src="" makes the browser re-request the current page, so a profile with no
+ * avatar gets this inline mark instead of an empty string. */
+const FALLBACK_AVATAR =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="%23d4d4d8"/><circle cx="12" cy="9.5" r="3.6" fill="%23fff"/><path d="M4.6 21a7.6 7.6 0 0 1 14.8 0z" fill="%23fff"/></svg>',
+  );
+
 const GRADE_TONE: Record<Nutrition["grade"], string> = {
   "A+": "text-green",
   A: "text-green",
@@ -38,15 +48,6 @@ const GRADE_TONE: Record<Nutrition["grade"], string> = {
  * before the label takes the stage. */
 const STEP_AT = [300, 1600, 3000];
 const CLOSE_MS = 420;
-
-const WARNINGS = [
-  "MAY CONTAIN TRACES OF REGRET",
-  "NOT EVALUATED BY ANY REAL AUTHORITY",
-  "DO NOT DEPLOY ON A FRIDAY",
-  "CONTAINS UNDECLARED DEPENDENCIES",
-  "KEEP AWAY FROM PRODUCTION",
-  "SIDE EFFECTS INCLUDE MERGE CONFLICTS",
-];
 
 const PRESETS = [
   { name: "torvalds", color: "var(--orange)" },
@@ -257,9 +258,8 @@ export default function DevNutrition({
         <div className="font-mono text-[10px] tracking-[0.24em] uppercase text-ink-3 sm:text-[10.5px]">
           Federal Dev Administration
         </div>
-        <h1 className="mt-3 text-[26px] leading-tight font-black tracking-tight sm:text-4xl">
-          DevNutrition <span className="text-ink-3">{"//"}</span>{" "}
-          <span className="font-medium text-ink-2">AI Profile Analysis</span>
+        <h1 className="mt-3 text-[30px] leading-tight font-black tracking-tight sm:text-[44px]">
+          DevNutrition
         </h1>
         <p className="mt-2.5 text-[13.5px] text-ink-2 sm:text-[14px]">
           Scan any GitHub handle. Receive its nutritional truth.
@@ -309,6 +309,11 @@ export default function DevNutrition({
         >
           <LoadingState variant="Dots" label={`Auditing @${handle}`} />
           <ScoreMeter key={handle} login={handle!} data={scanned} />
+          {scanned && (
+            <div className="w-full max-w-md">
+              <ProfileContext d={scanned} />
+            </div>
+          )}
           {step >= 1 && (
             <div className="w-full max-w-md">
               <ThinkingState variant="DevNutrition" />
@@ -372,6 +377,10 @@ export default function DevNutrition({
             </div>
           </div>
 
+          <div className="mt-6 flex justify-center">
+            <Advisory d={result} />
+          </div>
+
           <div className="mx-auto mt-6 max-w-md rounded-card bg-surface p-4 shadow-btn">
             <StreamingText
               content={VERDICT}
@@ -387,7 +396,7 @@ export default function DevNutrition({
                   name: "GitHub",
                   domain: "github.com",
                   href: `https://github.com/${result.login}`,
-                  image: result.avatar ?? "",
+                  image: result.avatar || FALLBACK_AVATAR,
                 },
               ]}
             />
@@ -426,22 +435,7 @@ export default function DevNutrition({
         </section>
       )}
 
-      {/* regulatory small print, scrolling forever like it means something */}
-      <div className="mt-14 overflow-hidden border-y border-line py-2">
-        <div className="animate-ticker flex w-max gap-8 font-mono text-[10px] tracking-[0.18em] whitespace-nowrap text-ink-3">
-          {[0, 1].map((copy) => (
-            <div key={copy} className="flex gap-8" aria-hidden={copy === 1}>
-              {WARNINGS.map((w) => (
-                <span key={w}>
-                  {w} <span className="text-ink-3/40">·</span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <footer className="mt-6 text-center font-mono text-[10px] tracking-[0.18em] uppercase text-ink-3">
+      <footer className="mt-16 text-center font-mono text-[10px] tracking-[0.18em] uppercase text-ink-3">
         Satire. Not affiliated with GitHub or any food authority.
       </footer>
 

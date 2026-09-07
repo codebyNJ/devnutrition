@@ -1,8 +1,18 @@
 "use client";
 
 import NutritionLabel from "@/components/NutritionLabel";
+import { ValuePill } from "@/components/atoms/ValuePill";
 import type { Nutrition } from "@/lib/nutrition";
 import { gradeNote } from "@/lib/nutrition";
+
+const GRADE_TONE: Record<Nutrition["grade"], "green" | "orange" | "red"> = {
+  "A+": "green",
+  A: "green",
+  B: "green",
+  C: "orange",
+  D: "orange",
+  F: "red",
+};
 
 /* Each card is the real thing: the same component, in the same `export` mode
  * that produces the shared PNG, scaled down. Not a summary of the label — the
@@ -40,8 +50,9 @@ export default function ExampleGallery({
             type="button"
             onClick={() => onPick(d.login)}
             aria-label={`Inspect ${d.login}, graded ${d.grade}`}
-            className="group overflow-hidden rounded-card bg-surface text-left shadow-btn
-              transition-transform duration-200 hover:-translate-y-0.5
+            className="group relative overflow-hidden rounded-card bg-surface text-left
+              shadow-btn transition-[transform,box-shadow] duration-200
+              hover:-translate-y-1 hover:shadow-raised
               focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             <div
@@ -56,14 +67,29 @@ export default function ExampleGallery({
                 <NutritionLabel d={d} mode="export" />
               </div>
               {/* fade the clip line so it reads as a preview, not a crop bug */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-b from-transparent to-white" />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-white" />
+            </div>
+
+            {/* the panel is paper, so the hover affordance rides above it
+                rather than tinting the artifact itself */}
+            <div
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity
+                duration-200 group-hover:opacity-100"
+              aria-hidden
+            >
+              <div className="absolute inset-x-0 bottom-[52px] flex justify-center">
+                <span className="rounded-full bg-ink px-3 py-1.5 text-[11.5px] font-medium text-canvas shadow-raised">
+                  Re-inspect
+                </span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 border-t border-line px-3 py-2.5">
+              <ValuePill tone={GRADE_TONE[d.grade]}>{d.grade}</ValuePill>
               <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">
                 @{d.login}
               </span>
-              <span className="shrink-0 font-mono text-[11px] text-ink-3">
+              <span className="hidden shrink-0 truncate font-mono text-[10.5px] text-ink-3 sm:block sm:max-w-[45%]">
                 {gradeNote(d.grade)}
               </span>
             </div>
