@@ -1,12 +1,60 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { GRADE_BANDS, GRADE_FORMULA, GRADE_TERMS, METRICS } from "@/lib/scoring";
-import { REPO_URL } from "@/lib/nutrition";
+import { REPO_URL, SITE_URL } from "@/lib/nutrition";
 
 export const metadata: Metadata = {
-  title: "How DevNutrition scores // Methodology",
+  title: "How the scoring works",
   description:
-    "Exactly which numbers come from a real GitHub profile, which are invented, and how the letter grade is calculated.",
+    "Exactly which numbers come from a real GitHub profile, which are invented, and how the DevNutrition letter grade is calculated.",
+  alternates: { canonical: "/scoring" },
+  openGraph: {
+    type: "article",
+    title: "How DevNutrition scores a GitHub developer",
+    description:
+      "Which numbers come from a real GitHub profile, which are invented, and the exact formula behind the letter grade.",
+    url: `${SITE_URL}/scoring`,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How DevNutrition scores a GitHub developer",
+    description:
+      "Which numbers come from a real GitHub profile, which are invented, and the exact formula behind the letter grade.",
+  },
+};
+
+/* FAQ structured data. These are the questions an answer engine actually gets
+ * asked about a tool like this, and the honest answers are short — which makes
+ * them quotable. */
+const FAQ = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      q: "What data does DevNutrition read from GitHub?",
+      a: "Three fields from one unauthenticated request to api.github.com/users/{handle}: public_repos, followers and created_at. No commits are read, no code is cloned, and nothing is stored.",
+    },
+    {
+      q: "Are the nutrition numbers real measurements?",
+      a: "No. Caffeine, saturated tech debt, documentation, Stack Overflow copy-paste and unused npm dependencies are invented. They are derived deterministically from a hash of the handle, so they never change for a given developer, but they measure nothing.",
+    },
+    {
+      q: "How is the letter grade calculated?",
+      a: "From three real signals plus a small invented nudge: reach = min(45, log10(followers + 1) x 8.2), output = min(20, log10(public_repos + 1) x 7), tenure = min(12, account age in years x 0.85), and craft = documentation x 2 minus techDebt/500 minus stackOverflow x 0.06. A+ is 66 and up, A is 55, B is 44, C is 33, D is 22, and anything lower is F.",
+    },
+    {
+      q: "Does DevNutrition measure code quality?",
+      a: "No, and it does not claim to. A public profile shows reach, output and tenure; it does not show what the inside of a codebase looks like.",
+    },
+    {
+      q: "Is it free, and does it need a login?",
+      a: "It is free and needs no account. It reads only public profile data.",
+    },
+  ].map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
 };
 
 const TONE: Record<string, string> = {
@@ -23,6 +71,10 @@ export default function ScoringPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl overflow-x-clip px-4 py-10 sm:px-6 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ) }}
+      />
       <Link
         href="/"
         className="font-mono text-[11px] tracking-[0.16em] uppercase text-ink-3

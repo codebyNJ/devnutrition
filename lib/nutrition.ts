@@ -128,6 +128,12 @@ export function analyze(login: string, u: GhUser | null): Nutrition {
 
 export const REPO_URL = "https://github.com/codebyNJ/devnutrition";
 
+/* Absolute origin, needed for metadataBase, canonicals, sitemap and OG image
+ * URLs. Overridable so preview deployments describe themselves correctly. */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://devnutrie.vercel.app"
+).replace(/\/$/, "");
+
 export const n = (x: number) => x.toLocaleString("en-US");
 
 /* The grade is earned from what a public profile actually shows: reach,

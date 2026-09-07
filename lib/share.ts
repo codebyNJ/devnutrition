@@ -1,9 +1,14 @@
 import type { Nutrition } from "./nutrition";
-import { n } from "./nutrition";
+import { n, SITE_URL } from "./nutrition";
+
+/* Every share carries the developer's own page, so the unfurl shows their
+ * panel as the thumbnail rather than the generic cover. */
+export const shareUrl = (d: Nutrition) => `${SITE_URL}/u/${d.login}`;
 
 export const shareText = (d: Nutrition) =>
-  `@${d.login} nutrition facts: ${n(d.caffeine)}mg caffeine, ${n(d.debt)}% saturated tech debt, ` +
-  `${d.docs}% documentation, ${d.aura}% raw aura. #DevNutrition`;
+  `@${d.login} — Grade ${d.grade} on DevNutrition: ${n(d.caffeine)}mg caffeine, ` +
+  `${n(d.debt)}% saturated tech debt, ${d.docs}% documentation, ${d.aura}% raw aura. ` +
+  `#DevNutrition`;
 
 /* html2canvas-pro rather than html2canvas: foundation.css is authored in
  * oklch(), which the original chokes on. Loaded lazily so it stays out of the
@@ -35,8 +40,13 @@ export function saveFile(blob: Blob, login: string) {
   requestAnimationFrame(() => URL.revokeObjectURL(url));
 }
 
-export const openXIntent = (text: string) =>
-  window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+export const openXIntent = (text: string, url?: string) =>
+  window.open(
+    `https://x.com/intent/tweet?text=${encodeURIComponent(text)}` +
+      (url ? `&url=${encodeURIComponent(url)}` : ""),
+    "_blank",
+    "noopener",
+  );
 
 /* The X web intent cannot carry an image, so the phone path is the OS share
  * sheet (which hands the real PNG to the X app) and the desktop path is
@@ -47,11 +57,12 @@ export async function shareLabel(
   d: Nutrition,
 ): Promise<"shared" | "dismissed" | "downloaded"> {
   const text = shareText(d);
+  const url = shareUrl(d);
   const file = toFile(blob, d.login);
 
   if (canShareFiles(file)) {
     try {
-      await navigator.share({ files: [file], text });
+      await navigator.share({ files: [file], text, url });
       return "shared";
     } catch (err) {
       /* the user backing out of the sheet is not a failure */
@@ -60,6 +71,6 @@ export async function shareLabel(
   }
 
   saveFile(blob, d.login);
-  openXIntent(text);
+  openXIntent(text, url);
   return "downloaded";
 }

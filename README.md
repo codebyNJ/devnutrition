@@ -71,6 +71,7 @@ run has played out *and* cleared the screen.
 | Route | What it is |
 | --- | --- |
 | `/` | the scanner, with server-loaded examples and the repo's star count |
+| `/u/{handle}` | a permanent, shareable panel for one developer — this is what a shared link resolves to |
 | `/duel` | compare two developers panel against panel, with a per-stat breakdown |
 | `/scoring` | the methodology — which numbers are real, which are invented, how the grade is computed |
 
@@ -93,6 +94,24 @@ Installed via `npx shadcn@latest add https://www.beautifului.dev/r/{name}.json`:
 `prompt-bar` was installed, tried, and removed: it is a full chat composer (textarea,
 model picker, dictation, `@`-menus) and this app takes a single word. It is not in the
 tree — `components/HandleInput.tsx` replaces it, built on the same tokens and `Button`.
+
+## Sharing and discovery
+
+Every share links to `/u/{handle}`, and that route has a sibling
+`opengraph-image.tsx` that renders **that developer's panel** as a 1200×630 PNG
+on demand. So a link posted to X, Slack or Discord unfurls with their label, not
+a generic banner. `/`, `/duel` and `/scoring` have their own generated covers.
+
+The images render through Satori, which reads a subset of CSS — inline styles,
+flexbox, no grid, no class names — so `lib/og.tsx` is a hand-built echo of the
+panel rather than a reuse of `NutritionLabel`. Font weights are registered as
+separate families (`InterBlack`, `InterBold`) because Satori's weight matching
+did not select the heavier faces.
+
+For answer engines: `/llms.txt` states plainly which figures are read from
+GitHub and which are invented, `/scoring` carries `FAQPage` structured data, the
+root carries `WebApplication`, and `robots.ts` names the AI crawlers explicitly
+rather than leaving them to the wildcard.
 
 ## Checks
 
